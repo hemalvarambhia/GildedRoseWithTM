@@ -21,7 +21,7 @@ class GildedRose
       item_delegate = get_item_delegate_for item
 
       if item_delegate
-        
+
       else
         update_quality_of(item)
       end
@@ -40,10 +40,10 @@ class GildedRose
         end
       end
     else
-      degrade_quality_of(item)
+      degrade_quality_of item
     end
 
-    update_sell_by_date_of(item)
+    update_sell_by_date_of item
 
     if (passed_sell_by_date?(item))
       if (item.name == "Aged Brie")
@@ -51,7 +51,7 @@ class GildedRose
       elsif (item.name == "Backstage passes to a TAFKAL80ETC concert")
         item.quality = 0
       else
-        degrade_quality_of(item)
+        degrade_quality_of item
       end
     end
   end
