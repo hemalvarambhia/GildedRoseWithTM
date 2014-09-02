@@ -16,51 +16,76 @@ class GildedRose
 
   def update_quality
 
-    for i in 0..(@items.size-1)
-      if (@items[i].name != "Aged Brie" && @items[i].name != "Backstage passes to a TAFKAL80ETC concert")
-        if (@items[i].quality > 0)
-          if (@items[i].name != "Sulfuras, Hand of Ragnaros")
-            @items[i].quality = @items[i].quality - 1
-          end
-        end
+    @items.each do |item|
+
+      item_delegate = get_item_delegate_for item
+
+      if item_delegate
+        #item_delegate.update_quality
       else
-        if (@items[i].quality < 50)
-          @items[i].quality = @items[i].quality + 1
-          if (@items[i].name == "Backstage passes to a TAFKAL80ETC concert")
-            if (@items[i].sell_in < 11)
-              if (@items[i].quality < 50)
-                @items[i].quality = @items[i].quality + 1
-              end
-            end
-            if (@items[i].sell_in < 6)
-              if (@items[i].quality < 50)
-                @items[i].quality = @items[i].quality + 1
-              end
-            end
-          end
-        end
-      end
-      if (@items[i].name != "Sulfuras, Hand of Ragnaros")
-        @items[i].sell_in = @items[i].sell_in - 1;
-      end
-      if (@items[i].sell_in < 0)
-        if (@items[i].name != "Aged Brie")
-          if (@items[i].name != "Backstage passes to a TAFKAL80ETC concert")
-            if (@items[i].quality > 0)
-              if (@items[i].name != "Sulfuras, Hand of Ragnaros")
-                @items[i].quality = @items[i].quality - 1
-              end
-            end
-          else
-            @items[i].quality = @items[i].quality - @items[i].quality
-          end
-        else
-          if (@items[i].quality < 50)
-            @items[i].quality = @items[i].quality + 1
-          end
-        end
+        update_quality_of(item)
       end
     end
   end
 
+  def update_quality_of(item)
+    if (item.name == "Aged Brie" or item.name == "Backstage passes to a TAFKAL80ETC concert")
+      increment_quality_of item
+      if (item.name == "Backstage passes to a TAFKAL80ETC concert")
+        if (item.sell_in < 11)
+          increment_quality_of item
+        end
+        if (item.sell_in < 6)
+          increment_quality_of item
+        end
+      end
+    else
+      degrade_quality_of(item)
+    end
+
+    update_sell_by_date_of(item)
+
+    if (passed_sell_by_date?(item))
+      if (item.name == "Aged Brie")
+        increment_quality_of item
+      elsif (item.name == "Backstage passes to a TAFKAL80ETC concert")
+        item.quality = 0
+      else
+        degrade_quality_of(item)
+      end
+    end
+  end
+
+  def items
+    @items.clone.freeze
+  end
+
+  private
+  def get_item_delegate_for(item)
+    nil
+  end
+
+  def passed_sell_by_date?(item)
+    item.sell_in < 0
+  end
+
+  def update_sell_by_date_of(item)
+    if (item.name != "Sulfuras, Hand of Ragnaros")
+      item.sell_in = item.sell_in - 1;
+    end
+  end
+
+  def degrade_quality_of(item)
+    if (item.name != "Sulfuras, Hand of Ragnaros")
+      if (item.quality > 0)
+        item.quality = item.quality - 1
+      end
+    end
+  end
+
+  def increment_quality_of(item)
+    if (item.quality < 50)
+      item.quality = item.quality + 1
+    end
+  end
 end
