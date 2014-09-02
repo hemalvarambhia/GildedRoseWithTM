@@ -21,7 +21,7 @@ class GildedRose
       item_delegate = get_item_delegate_for item
 
       if item_delegate
-        #item_delegate.update_quality
+        
       else
         update_quality_of(item)
       end
