@@ -196,6 +196,4 @@ describe GildedRose do
   def item_called(name)
     subject.items.select{|item| item.name == name}.first
   end
-
-
 end
