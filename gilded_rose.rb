@@ -1,5 +1,9 @@
 require './item.rb'
-
+require './aged_brie.rb'
+require './backstage_passes.rb'
+require './normal_item.rb'
+require './sulfaras.rb'
+require './consumer_item.rb'
 class GildedRose
 
   @items = []
@@ -17,42 +21,8 @@ class GildedRose
   def update_quality
 
     @items.each do |item|
-
       item_delegate = get_item_delegate_for item
-
-      if item_delegate
-
-      else
-        update_quality_of(item)
-      end
-    end
-  end
-
-  def update_quality_of(item)
-    if (item.name == "Aged Brie" or item.name == "Backstage passes to a TAFKAL80ETC concert")
-      increment_quality_of item
-      if (item.name == "Backstage passes to a TAFKAL80ETC concert")
-        if (item.sell_in < 11)
-          increment_quality_of item
-        end
-        if (item.sell_in < 6)
-          increment_quality_of item
-        end
-      end
-    else
-      degrade_quality_of item
-    end
-
-    update_sell_by_date_of item
-
-    if (passed_sell_by_date?(item))
-      if (item.name == "Aged Brie")
-        increment_quality_of item
-      elsif (item.name == "Backstage passes to a TAFKAL80ETC concert")
-        item.quality = 0
-      else
-        degrade_quality_of item
-      end
+      item_delegate.update
     end
   end
 
@@ -60,9 +30,20 @@ class GildedRose
     @items.clone.freeze
   end
 
-  private
   def get_item_delegate_for(item)
-    nil
+    if item.name == "Sulfuras, Hand of Ragnaros"
+      return Sulfaras.new(self, item)
+    end
+
+    if item.name == "Backstage passes to a TAFKAL80ETC concert"
+      return BackstagePasses.new(self, item)
+    end
+
+    if item.name == "Aged Brie"
+      return AgedBrie.new(self, item)
+    end
+
+    NormalItem.new(self, item)
   end
 
   def passed_sell_by_date?(item)
@@ -70,9 +51,7 @@ class GildedRose
   end
 
   def update_sell_by_date_of(item)
-    if (item.name != "Sulfuras, Hand of Ragnaros")
-      item.sell_in = item.sell_in - 1;
-    end
+    item.sell_in = item.sell_in - 1;
   end
 
   def degrade_quality_of(item)
